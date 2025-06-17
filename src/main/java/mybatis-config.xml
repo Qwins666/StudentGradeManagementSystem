@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<!-- 数据库连接信息 -->
+	<properties>
+		<property name="username" value="root" />
+		<property name="password" value="123456" />
+		<property name="driver" value="com.mysql.cj.jdbc.Driver" />
+		<property name="url"
+			value="jdbc:mysql://127.0.0.1:3306/student_score_manage?useUnicode=
+true&amp;characterEncoding=UTF-8&amp;allowMultiQueries=true&amp;serverTimezone=GMT%2B8" />
+	</properties>
+	<!-- 为com.mybatis.po包下的所有实体类配置别名，MyBatis默认的设置别名的方式就是去除类所在的包后的简单的类名, 比如com.mybatis.po.MyUser这个实体类的别名就会被设置成MyUser -->
+	<typeAliases>
+		<package name="com.dao" />
+	</typeAliases>
+	<!-- SSM整合后 environments配置将废除 -->
+    <environments default="development">
+        <environment id="development">
+            <!-- 使用jdbc事务管理 -->
+            <transactionManager type="JDBC" />
+            <!-- 数据库连接池 -->
+            <dataSource type="POOLED">
+                <property name="driver" value="${driver}" />
+                <property name="url" value="${url}" />
+                <property name="username" value="${username}" />
+                <property name="password" value="${password}" />
+            </dataSource>
+        </environment>
+    </environments>
+    <!-- 加载映射文件 -->
+	<mappers>
+		<mapper resource="com/mapper/UserMapper.xml" />
+		<mapper resource="com/mapper/StudentMapper.xml" />
+		<mapper resource="com/mapper/TeacherMapper.xml" />
+	</mappers>
+</configuration>

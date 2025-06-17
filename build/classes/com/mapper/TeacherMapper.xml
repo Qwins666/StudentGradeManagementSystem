@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.TeacherMapper">
+	<!-- 添加教师 -->
+	<insert id="addTeacherByAdmin" parameterType="Teacher">
+		insert into
+		teacher(teacherid,teachername) values(#{teacherid},#{teachername})
+	</insert>
+
+	<!-- 查询教师是否存在 -->
+	<select id="selectTeacherByNo" parameterType="String"
+		resultType="com.dao.Teacher">
+		select * from teacher where teacherid=#{newusername}
+	</select>
+	<select id="selectTeacherById" parameterType="String"
+		resultType="com.dao.Teacher">
+		select * from teacher where teacherid = #{teacherid}
+	</select>
+
+	<!-- 查询教师所有课程成绩 通过课程名查询成绩 -->
+	<select id="selectAllCourseByTid" parameterType="String"
+		resultType="com.dao.Score">
+		select
+		s.studentid as studentid,
+		s.studentname as studentname,
+		s.classid as classid,
+		c.courseid as courseid,
+		c.coursename as coursename,
+		sc.score as score,
+		sc.remark as remark,
+		sc.scoreid as scoreid
+		from teacher t
+		join teach tc on t.teacherid = tc.teacherid
+		join class cl on tc.classid = cl.classid
+		join student s on cl.classid = s.classid
+		join course c on tc.courseid = c.courseid
+		join score sc on s.studentid = sc.studentid and c.courseid = sc.courseid
+		where t.teacherid = #{teacherid}
+		order by s.classid, s.studentid, c.courseid;
+	</select>
+
+	<!-- 修改密码 -->
+	<update id="resetPassword" parameterType="User">
+		update user set
+		password=#{password} where username = #{username}
+	</update>
+	
+	<select id="selectAllTeach" parameterType="String"
+		resultType="com.dao.Teach">
+		select * from teach where teacherid=#{username}
+	</select>
+
+	<!-- 更新成绩 -->
+	<update id="updateScore" parameterType="map">
+		update score set score =
+		#{score} where scoreid = #{scoreid}
+	</update>
+	
+	<!-- 删除教师 -->
+	<delete id="deleteTeacher" parameterType="String">
+		delete from teacher where teacherid=#{username}
+	</delete>
+</mapper>

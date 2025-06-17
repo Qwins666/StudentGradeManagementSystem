@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.UserMapper">
+	<!-- 根据学号查询用户信息 -->
+	<select id="selectUserByName" parameterType="String"
+		resultType="com.dao.User">
+		select * from user where username=#{username} and
+		password=#{password}
+	</select>
+
+	<!-- 查询所有用户 支持模糊查询 -->
+	<select id="selectAllUsers" resultType="com.dao.User">
+		select * from user
+		<where>
+			<if test="userid != null and userid != ''">
+				and userid like concat('%', #{userid}, '%')
+			</if>
+			<if test="userrole != null and userrole != ''">
+				and userrole like concat('%', #{userrole}, '%')
+			</if>
+			<if test="username != null and username != ''">
+				and username like concat('%', #{username}, '%')
+			</if>
+		</where>
+	</select>
+
+	<!-- 添加用户 -->
+	<insert id="addUser" parameterType="User">
+		insert into user
+		values(#{userid},#{username},#{password},#{userrole})
+	</insert>
+
+	<!--删除用户 -->
+	<delete id="deleteUser" parameterType="User">
+		delete from user where
+		userid = #{userId}
+	</delete>
+
+	<!-- 更新用户信息 -->
+	<update id="updateUser" parameterType="User">
+		update user
+		<set>
+			<if test="username != null and username != ''">username=#{username},</if>
+			<if test="userrole != null and userrole != ''">userrole=#{userrole}</if>
+		</set>
+		where userid = #{userid}
+	</update>
+
+	<!-- 用户重置密码 -->
+	<update id="resetPassword" parameterType="User">
+		update user set
+		password="000000" where userid = #{userid}
+	</update>
+
+	<!-- 查询所有班级 支持模糊查询 -->
+	<select id="selectAllClass" resultType="com.dao.Class">
+		select * from class
+		<where>
+			<if test="cno != null and cno != ''">
+				and cno like concat('%', #{cno}, '%')
+			</if>
+			<if test="cname != null and cname != ''">
+				and cname like concat('%', #{cname}, '%')
+			</if>
+			<if test="grade != null and grade != ''">
+				and grade like concat('%', #{grade}, '%')
+			</if>
+			<if test="major != null and major != ''">
+				and major like concat('%', #{major}, '%')
+			</if>
+		</where>
+	</select>
+
+	<!-- 更新学生信息 -->
+	<update id="updateStudentForClass" parameterType="Student">
+		update student
+		set classid=#{classid} where studentid = #{studentid}
+	</update>
+
+	<!-- 根据班级ID查询课程ID -->
+	<select id="selectCourseIdsByClassId" parameterType="int"
+		resultType="int">
+		select courseid from teach where classid = #{classid}
+	</select>
+
+	<!-- 检查学生-课程记录是否存在 -->
+	<select id="countScoreByStudentAndCourse" parameterType="map"
+		resultType="int">
+		select count(*) from score
+		where studentid = #{studentid} and courseid = #{courseid}
+	</select>
+
+	<!-- 插入学生-课程记录 -->
+	<insert id="insertScoreRecord" parameterType="map">
+		insert into score (studentid, courseid)
+		values (#{studentid}, #{courseid})
+	</insert>
+
+	<!-- 查询所有班级 支持模糊查询 -->
+	<select id="selectAllCourse" resultType="com.dao.Course">
+		SELECT
+    		c.courseid,
+    		c.coursename,
+    		c.credit,
+    		c.hour,
+    		CASE
+        		WHEN GROUP_CONCAT(DISTINCT t.teachername) IS NULL THEN '未分配'
+        		ELSE GROUP_CONCAT(DISTINCT t.teachername)
+    		END AS courseteacher
+		FROM course c
+		LEFT JOIN teach tc ON c.courseid = tc.courseid
+		LEFT JOIN teacher t ON tc.teacherid = t.teacherid
+		GROUP BY c.courseid
+	</select>
+
+	<!-- 根据学号查询用户信息 -->
+	<select id="selectStudentById" parameterType="Student"
+		resultType="com.dao.Student">
+		select * from student where studentid=#{studentid}
+	</select>
+	
+	<!-- 根据用户id查询用户信息 -->
+	<select id="selectUserById" parameterType="Integer"
+		resultType="com.dao.User">
+		select * from user where userid=#{userId}
+	</select>
+
+	<!-- 查询班级是否存在 -->
+	<select id="selectClassByID" parameterType="Class"
+		resultType="com.dao.Class">
+		select * from class where classid=#{classid}
+	</select>
+
+	<!-- 更新班级信息 -->
+	<update id="updateClass" parameterType="Class">
+		update class
+		<set>
+			<if test="classname != null and classname != ''">classname=#{classname},</if>
+			<if test="grade != null and grade != ''">grade=#{grade},</if>
+			<if test="major != null and major != ''">major=#{major}</if>
+		</set>
+		where classid = #{classid}
+	</update>
+
+	<!-- 查询班级中是否存在学生 -->
+	<select id="countStudentsByClassId" parameterType="Integer" resultType="Integer">
+    	select count(*) from student where classid = #{classid}
+	</select>
+
+	<!-- 查询班级中是否存在学生 -->
+	<select id="selectStudentsByClassId" parameterType="map" resultType="com.dao.Student">
+    	select * from student where classid = #{classid}
+	</select>
+	
+	<!--删除班级 -->
+	<delete id="deleteClass" parameterType="Class">
+		delete from class where
+		classid = #{classid}
+	</delete>
+
+	<!-- 添加班级 -->
+	<insert id="addClass" parameterType="Class">
+		insert into class
+		values(#{classid},#{classname},#{grade},#{major})
+	</insert>
+
+	<!-- 添加课程 -->
+	<insert id="addCourse" parameterType="Course">
+		insert into course
+		values(#{courseid},#{coursename},#{credit},#{hour})
+	</insert>
+
+	<!-- 更新课程信息 -->
+	<update id="updateCourse" parameterType="Course">
+		update course
+		<set>
+			<if test="coursename != null and coursename != ''">coursename=#{coursename},</if>
+			<if test="credit != null and credit != ''">credit=#{credit},</if>
+			<if test="hour != null and hour != ''">hour=#{hour}</if>
+		</set>
+		where courseid = #{courseid}
+	</update>
+
+	<!-- 设置教师的信息 -->
+	<insert id="insertTeach" parameterType="com.dao.Teach">
+		insert into teach
+		(teacherid, courseid, classid)
+		values (#{teacherid}, #{courseid},
+		#{classid})
+	</insert>
+
+	<delete id="deleteTeachByCourseAndClass" parameterType="map">
+		delete
+		from teach
+		where courseid = #{courseid} and classid = #{classid}
+	</delete>
+
+	<!-- 查询课程id通过学号 -->
+	<select id="selectCourseidByStuid" parameterType="String"
+		resultType="String">
+		SELECT t.courseid
+		FROM teach t
+		JOIN student s ON t.classid =
+		s.classid
+		WHERE s.studentid = #{studentid}
+	</select>
+
+	<!-- 删除课程 -->
+	<delete id="deleteCourse" parameterType="Integer">
+		delete from course where
+		courseid = #{courseid}
+	</delete>
+
+	<!-- 根据教师名查询是否存在 -->
+	<select id="selectTeacherByName" parameterType="String"
+		resultType="com.dao.Teacher">
+		select * from teacher where tid=#{teacherid}
+	</select>
+
+	<!-- 查询所有成绩 支持模糊查询 -->
+	<select id="selectAllScore" resultType="com.dao.Score">
+		select * from score
+		<where>
+			<if test="scoreid != null and scoreid != ''">
+				and scoreid like concat('%', #{scoreid}, '%')
+			</if>
+			<if test="sno != null and sno != ''">
+				and sno like concat('%', #{sno}, '%')
+			</if>
+			<if test="sname != null and sname != ''">
+				and sname like concat('%', #{sname}, '%')
+			</if>
+			<if test="cname != null and cname != ''">
+				and cname like concat('%', #{cname}, '%')
+			</if>
+			<if test="coursename != null and coursename != ''">
+				and coursename like concat('%', #{coursename}, '%')
+			</if>
+			<if test="score != null and score != ''">
+				and score like concat('%', #{score}, '%')
+			</if>
+			<if test="cno != null and cno != ''">
+				and cno like concat('%', #{cno}, '%')
+			</if>
+			<if test="remark != null and remark != ''">
+				and remark like concat('%', #{remark}, '%')
+			</if>
+		</where>
+	</select>
+	<!-- 查询成绩信息（多表关联） -->
+	<select id="getScoresByCondition" resultType="com.dao.Score">
+		SELECT
+		s.scoreid,
+		st.studentid,
+		st.studentname,
+		cl.classid,
+		cl.classname,
+		co.courseid,
+		co.coursename,
+		s.score,
+		s.remark
+		FROM
+		score s
+		JOIN
+		student st ON
+		s.studentid = st.studentid
+		JOIN
+		class cl ON st.classid = cl.classid
+		JOIN
+		course co ON s.courseid = co.courseid
+		<where>
+			<if test="classid != null and classid != ''">
+				AND cl.classid LIKE CONCAT('%', #{classid}, '%')
+			</if>
+			<if test="studentid != null and studentid != ''">
+				AND st.studentid LIKE CONCAT('%', #{studentid}, '%')
+			</if>
+			<if test="coursename != null and coursename != ''">
+				AND co.coursename LIKE CONCAT('%', #{coursename}, '%')
+			</if>
+		</where>
+		ORDER BY s.scoreid DESC
+	</select>
+
+	<!-- 更新审核状态 -->
+	<update id="updateRemark" parameterType="com.dao.Score">
+		update score set remark
+		= #{remark} where scoreid = #{scoreid}
+	</update>
+
+	<!-- 查询总学生人数 -->
+	<select id="selectStudentNum" resultType="Integer">
+		select count(*) from
+		user where userrole = 'student';
+	</select>
+
+	<!-- 查询总教师人数 -->
+	<select id="selectTeacherNum" resultType="Integer">
+		select count(*) from
+		user where userrole = 'teacher';
+	</select>
+
+	<!-- 查询总课程数 -->
+	<select id="selectCourseNum" resultType="Integer">
+		select count(distinct
+		coursename) from course;
+	</select>
+
+	<!-- 查询总成绩记录数 -->
+	<select id="selectScoreNum" resultType="Integer">
+		select count(scoreid)
+		from score;
+	</select>
+
+	<!-- 统计各专业学生人数 -->
+	<select id="getMajorStudentCount" resultType="java.util.Map">
+		select c.major, count(s.studentid) as student_count
+		from class c
+		inner join
+		student s on c.classid = s.classid
+		group by c.major
+		order by
+		student_count desc
+	</select>
+
+	<!-- 统计成绩分布比列 -->
+	<select id="getScoreStudentCount" resultType="java.util.Map">
+		<!--忽略特殊字符 -->
+    <![CDATA[  
+    select 
+        case 
+            when score >= 90 and score <= 100 then '90-100分'
+            when score >= 80 and score < 90 then '80-89分'
+            when score >= 70 and score < 80 then '70-79分'
+            when score >= 60 and score < 70 then '60-69分'
+            else '不及格'
+        end as score_range,
+        count(*) as count
+    from score
+    group by score_range
+    ]]>
+	</select>
+
+	<!-- 统计各个专业的最高分，最低分，平均分 -->
+	<select id="getCourseStudentCount" resultType="java.util.Map">
+		select
+		c.coursename,
+		max(s.score) as max_score,
+		min(s.score) as min_score,
+		avg(s.score) as avg_score
+		from
+		score s
+		inner join
+		course c on s.courseid =
+		c.courseid
+		group by
+		c.coursename
+	</select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

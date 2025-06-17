@@ -1,0 +1,107 @@
+成绩表(Score)属性：
+scoreid(成绩id):int 主键，自动递增，唯一标识成绩记录
+studentid(学生id):string 外键，关联学生表studentidxue
+courseid(课程id):int 外键，关联课程表courseid，标识成绩对应课程
+score(分数)：double 存储学生课程成绩(如：90.0)
+remark(审核状态):string 标识成绩是否异常
+
+授课关系表(Teach)属性：
+teachid(授课id):int 主键，非空 自动递增
+teacherid(授课教师id):string 外键关联teacher表teacherid
+courseid（课程 id）：int 外键关联course表courseid
+classid（班级id）: int 外键关联class表classid
+
+课程表(Course)属性:
+courseid(课程id): int 主键，自动递增
+coursename（课程名称）：string 非空，如 “Java程序设计”
+credit（学分）：double 非空，课程学分（如 4.0）
+hour（学时）：int 非空，课程总学时
+
+用户表(User)属性:
+userid(用户id):int 非空 主键，自动递增
+username(用户名)：string 非空 唯一标识
+password(密码): string 非空
+userrole(角色): string非空 选取student,teacher,admin  
+
+班级表(Class)属性：
+classid(班级id):int 主键，非空 自动递增
+classname(班级名): string 非空
+grade(年级): string 非空 
+major(专业): string 非空
+
+学生表(Student)属性:
+studentid(学生id): string 非空 主键 外键关联用户表username
+studentname(学生姓名): string 非空 
+classid(班级id)：int 非空 外键关联班级表classid
+
+教师表(Tacher)属性:
+teacherid(教师id): int 主键 非空 外键关联用户表username
+teachername(教师名): string 非空 外键关联用户表userid 唯一标识
+
+
+
+
+
+-- 用户表（所有角色的基础信息）
+CREATE TABLE `user` (
+  `userid` INT AUTO_INCREMENT PRIMARY KEY COMMENT '用户ID',
+  `username` VARCHAR(50) NOT NULL UNIQUE COMMENT '用户名',
+  `password` VARCHAR(100) NOT NULL COMMENT '密码',
+  `userrole` ENUM('student','teacher','admin') NOT NULL COMMENT '角色'
+) COMMENT '系统用户表';
+
+-- 班级表
+CREATE TABLE `class` (
+  `classid` INT AUTO_INCREMENT  PRIMARY KEY COMMENT '班级ID',
+  `classname` VARCHAR(50) NOT NULL COMMENT '班级名称',
+  `grade` VARCHAR(20) NOT NULL COMMENT '年级',
+  `major` VARCHAR(50) NOT NULL COMMENT '专业'
+) COMMENT '班级信息表';
+
+-- 学生表（扩展用户表）
+CREATE TABLE `student` (
+  `studentid` INT  PRIMARY KEY COMMENT '学生ID',
+  `studentname` varchar(50) NOT NULL COMMENT '学生姓名',
+  `classid` INT NOT NULL COMMENT '所属班级ID',
+  FOREIGN KEY (`classid`) REFERENCES `class`(`classid`)
+) COMMENT '学生信息表';
+
+-- 教师表（扩展用户表）
+CREATE TABLE `teacher` (
+  `teacherid` INT PRIMARY KEY COMMENT '教师ID',
+  `teachername` varchar(50) NOT NULL COMMENT '教师姓名',
+  `userid` INT NOT NULL UNIQUE COMMENT '关联用户ID',
+  FOREIGN KEY (`userid`) REFERENCES `user`(`userid`)
+) COMMENT '教师信息表';
+
+-- 课程表
+CREATE TABLE `course` (
+  `courseid` INT AUTO_INCREMENT PRIMARY KEY COMMENT '课程ID',
+  `coursename` VARCHAR(100) NOT NULL COMMENT '课程名称',
+  `credit` DECIMAL(4,1) NOT NULL COMMENT '学分',
+  `hour` INT NOT NULL COMMENT '学时'
+) COMMENT '课程信息表';
+
+-- 授课关系表（教师-课程-班级关联）
+CREATE TABLE `teach` (
+  `teachid` INT AUTO_INCREMENT PRIMARY KEY COMMENT '授课ID',
+  `teacherid` INT NOT NULL COMMENT '教师ID',
+  `courseid` INT NOT NULL COMMENT '课程ID',
+  `classid` INT NOT NULL COMMENT '班级ID',
+  FOREIGN KEY (`teacherid`) REFERENCES `teacher`(`teacherid`),
+  FOREIGN KEY (`courseid`) REFERENCES `course`(`courseid`),
+  FOREIGN KEY (`classid`) REFERENCES `class`(`classid`),
+  UNIQUE KEY `unique_teach` (`teacherid`,`courseid`,`classid`)
+) COMMENT '授课关系表';
+
+-- 成绩表
+CREATE TABLE `score` (
+  `scoreid` INT AUTO_INCREMENT PRIMARY KEY COMMENT '成绩ID',
+  `studentid` INT NOT NULL COMMENT '学生ID',
+  `courseid` INT NOT NULL COMMENT '课程ID',
+  `score` DOUBLE DEFAULT 0.0 COMMENT '分数',
+  `remark` ENUM('OK','NO') DEFAULT 'OK' COMMENT '审核状态',
+  FOREIGN KEY (`studentid`) REFERENCES `student`(`studentid`),
+  FOREIGN KEY (`courseid`) REFERENCES `course`(`courseid`),
+  UNIQUE KEY `unique_score` (`studentid`,`courseid`)
+) COMMENT '成绩记录表';

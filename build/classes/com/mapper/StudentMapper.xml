@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.StudentMapper">
+	<!-- 添加学生 -->
+	<insert id="addStudentByAdmin" parameterType="Student">
+		insert into
+		student(studentid,studentname) values(#{studentid},#{studentname})
+	</insert>
+
+	<!-- 查询学生所有成绩 -->
+	<select id="selectPersonScore" parameterType="String"
+		resultType="com.dao.Score">
+		select s.studentid as studentid,s.studentname as studentname,c.coursename as coursename,sc.score as score
+		from student s
+		join score sc on s.studentid = sc.studentid 
+		join course c on sc.courseid = c.courseid
+		where s.studentid=#{studentid}
+		order by s.studentid, c.courseid;
+	</select>
+
+	<!-- 查询学生是否存在 -->
+	<select id="selectStudentBySno" parameterType="String" 
+		resultType="com.dao.Student">
+		select * from student where studentid=#{username}
+	</select>
+
+	<!-- 查询课程名 -->
+	<select id="findCourse" parameterType="Score"  
+		resultType="com.dao.Score">
+		select * from score
+		<where>
+			<if test="studenid != null and studentid != ''">
+				and studenid=#{studenid}
+			</if>
+			<if test="coursename != null and coursename != ''">
+				and coursename like concat('%', #{coursename}, '%')
+			</if>
+		</where>
+	</select>
+
+	<!-- 查询学生所有课程信息 通过课程名查询成绩 -->
+	<select id="selectCourse" parameterType="String"
+		resultType="com.dao.Course">
+		select c.courseid as courseid,c.coursename as coursename,c.credit as credit,c.hour as hour,t.teachername as courseteacher
+		from student s
+		join teach tc on s.classid=tc.classid
+		join course c on tc.courseid=c.courseid
+		join teacher t on tc.teacherid=t.teacherid
+		where s.studentid=#{studentid}
+		order by c.courseid;
+	</select>
+
+	<!-- 修改密码 -->
+	<update id="resetPassword" parameterType="User"> 
+		update user set
+		password=#{password} where username = #{username}
+	</update>
+</mapper>
