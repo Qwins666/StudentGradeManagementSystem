@@ -8,7 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>学生成绩管理系统</title>
 <style>
-* {
+*{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -351,7 +351,7 @@ button {
             <c:if test="${not empty error}">
                 showTopMessage('error', '${fn:escapeXml(error)}');
             </c:if>
-        };
+        });
         
         // 表单提交前的处理
         document.getElementById('loginForm').addEventListener('submit', function(e) {
