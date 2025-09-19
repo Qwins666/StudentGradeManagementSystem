@@ -1,5 +1,6 @@
 #基于SSM框架的学生成绩管理系统 
 该系统分为学生、教师、管理员端，学生能查询对应的课程、成绩、授课教师，老师能对所管理班级的学生进行成绩登记、标记、导出成绩表，管理员能够设置课程的授课教师、学生所属的班级、对用户进行CRUD维护，以及直观查看相应的成绩、课程、人员的图表
+
 <img width="687" height="811" alt="{81BBBDDA-76B2-4AF7-84E0-48BB04E83DE8}" src="https://github.com/user-attachments/assets/60283974-3446-486f-bbd7-9b95bf236a13" />
 
 <img width="1667" height="812" alt="image" src="https://github.com/user-attachments/assets/9a061d26-ba72-4406-bb56-321d5bb07b15" />
